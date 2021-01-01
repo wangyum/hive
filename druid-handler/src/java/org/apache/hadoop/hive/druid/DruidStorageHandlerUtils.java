@@ -825,7 +825,7 @@ public final class DruidStorageHandlerUtils {
     if (shardSpec instanceof LinearShardSpec) {
       return new LinearShardSpec(shardSpec.getPartitionNum() + 1);
     } else if (shardSpec instanceof NumberedShardSpec) {
-      return new NumberedShardSpec(shardSpec.getPartitionNum(), ((NumberedShardSpec) shardSpec).getPartitions());
+      return new NumberedShardSpec(shardSpec.getPartitionNum(), ((NumberedShardSpec) shardSpec).getPartitionNum());
     } else {
       // Druid only support appending more partitions to Linear and Numbered ShardSpecs.
       throw new IllegalStateException(String.format("Cannot expand shard spec [%s]", shardSpec));

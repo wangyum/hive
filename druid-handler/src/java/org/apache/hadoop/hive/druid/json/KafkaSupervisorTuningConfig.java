@@ -22,7 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.druid.segment.IndexSpec;
-import org.apache.druid.segment.indexing.TuningConfigs;
+import org.apache.druid.segment.incremental.AppendableIndexSpec;
+import org.apache.druid.segment.incremental.OnheapIncrementalIndex;
+import org.apache.druid.segment.indexing.RealtimeTuningConfig;
 import org.apache.druid.segment.writeout.SegmentWriteOutMediumFactory;
 import org.joda.time.Duration;
 import org.joda.time.Period;
@@ -136,8 +138,8 @@ public class KafkaSupervisorTuningConfig
   @Override
   public String toString() {
     return "KafkaSupervisorTuningConfig{" + "maxRowsInMemory=" + getMaxRowsInMemory() + ", maxRowsPerSegment="
-        + getMaxRowsPerSegment() + ", maxTotalRows=" + getMaxTotalRows() + ", maxBytesInMemory=" + TuningConfigs
-        .getMaxBytesInMemoryOrDefault(getMaxBytesInMemory()) + ", intermediatePersistPeriod="
+        + getMaxRowsPerSegment() + ", maxTotalRows=" + getMaxTotalRows() + ", maxBytesInMemory="
+        + getMaxBytesInMemory() + ", intermediatePersistPeriod="
         + getIntermediatePersistPeriod() + ", basePersistDirectory=" + getBasePersistDirectory()
         + ", maxPendingPersists=" + getMaxPendingPersists() + ", indexSpec=" + getIndexSpec()
         + ", reportParseExceptions=" + isReportParseExceptions() + ", handoffConditionTimeout="
@@ -157,5 +159,15 @@ public class KafkaSupervisorTuningConfig
         getIndexSpec(), getIndexSpecForIntermediatePersists(), true, isReportParseExceptions(),
         getHandoffConditionTimeout(), isResetOffsetAutomatically(), getSegmentWriteOutMediumFactory(),
         getIntermediateHandoffPeriod(), isLogParseExceptions(), getMaxParseExceptions(), getMaxSavedParseExceptions());
+  }
+
+  @Override
+  public AppendableIndexSpec getAppendableIndexSpec() {
+    return new OnheapIncrementalIndex.Spec();
+  }
+
+  @Override
+  public long getMaxBytesInMemoryOrDefault() {
+    return 0;
   }
 }

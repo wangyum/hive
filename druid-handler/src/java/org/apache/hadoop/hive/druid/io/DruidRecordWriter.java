@@ -28,6 +28,9 @@ import org.apache.druid.data.input.InputRow;
 import org.apache.druid.data.input.MapBasedInputRow;
 import org.apache.druid.java.util.common.DateTimes;
 import org.apache.druid.java.util.common.granularity.Granularity;
+import org.apache.druid.segment.incremental.NoopRowIngestionMeters;
+import org.apache.druid.segment.incremental.ParseExceptionHandler;
+import org.apache.druid.segment.incremental.RowIngestionMeters;
 import org.apache.druid.segment.indexing.DataSchema;
 import org.apache.druid.segment.indexing.RealtimeTuningConfig;
 import org.apache.druid.segment.loading.DataSegmentPusher;
@@ -36,7 +39,7 @@ import org.apache.druid.segment.realtime.appenderator.Appenderator;
 import org.apache.druid.segment.realtime.appenderator.Appenderators;
 import org.apache.druid.segment.realtime.appenderator.SegmentIdWithShardSpec;
 import org.apache.druid.segment.realtime.appenderator.SegmentNotWritableException;
-import org.apache.druid.segment.realtime.appenderator.SegmentsAndMetadata;
+import org.apache.druid.segment.realtime.appenderator.SegmentsAndCommitMetadata;
 import org.apache.druid.segment.realtime.plumber.Committers;
 import org.apache.druid.timeline.DataSegment;
 import org.apache.druid.timeline.partition.LinearShardSpec;
@@ -104,9 +107,12 @@ public class DruidRecordWriter implements RecordWriter<NullWritable, DruidWritab
     this.dataSchema = Preconditions.checkNotNull(dataSchema, "data schema is null");
 
     appenderator = Appenderators
-        .createOffline("hive-offline-appenderator", this.dataSchema, tuningConfig, false, new FireDepartmentMetrics(),
+        .createOffline("hive-offline-appenderator", this.dataSchema, tuningConfig, new FireDepartmentMetrics(),
             dataSegmentPusher, DruidStorageHandlerUtils.JSON_MAPPER, DruidStorageHandlerUtils.INDEX_IO,
-            DruidStorageHandlerUtils.INDEX_MERGER_V9);
+            DruidStorageHandlerUtils.INDEX_MERGER_V9, null, null);
+    // String id, DataSchema schema, AppenderatorConfig config, FireDepartmentMetrics metrics, DataSegmentPusher dataSegmentPusher,
+    // ObjectMapper objectMapper, IndexIO indexIO,
+    // IndexMerger indexMerger, RowIngestionMeters rowIngestionMeters, ParseExceptionHandler parseExceptionHandler
     this.maxPartitionSize = maxPartitionSize;
     appenderator.startJob();
     this.segmentsDescriptorDir = Preconditions.checkNotNull(segmentsDescriptorsDir, "segmentsDescriptorsDir is null");
@@ -170,7 +176,7 @@ public class DruidRecordWriter implements RecordWriter<NullWritable, DruidWritab
 
   private void pushSegments(List<SegmentIdWithShardSpec> segmentsToPush) {
     try {
-      SegmentsAndMetadata segmentsAndMetadata = appenderator.push(segmentsToPush, committerSupplier.get(), false).get();
+      SegmentsAndCommitMetadata segmentsAndMetadata = appenderator.push(segmentsToPush, committerSupplier.get(), false).get();
       final Set<String> pushedSegmentIdentifierHashSet = new HashSet<>();
 
       for (DataSegment pushedSegment : segmentsAndMetadata.getSegments()) {

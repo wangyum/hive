@@ -21,6 +21,8 @@ package org.apache.hadoop.hive.druid.json;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.druid.segment.IndexSpec;
+import org.apache.druid.segment.incremental.AppendableIndexSpec;
+import org.apache.druid.segment.incremental.OnheapIncrementalIndex;
 import org.apache.druid.segment.writeout.SegmentWriteOutMediumFactory;
 import org.joda.time.Period;
 
@@ -125,4 +127,13 @@ public class KafkaIndexTaskTuningConfig extends SeekableStreamIndexTaskTuningCon
         '}';
   }
 
+  @Override
+  public AppendableIndexSpec getAppendableIndexSpec() {
+    return new OnheapIncrementalIndex.Spec();
+  }
+
+  @Override
+  public long getMaxBytesInMemoryOrDefault() {
+    return 0;
+  }
 }
