@@ -20,6 +20,9 @@
 name: Publish Snapshot
 
 on:
+  push:
+    branches:
+    - '**'
   schedule:
   - cron: '0 0 * * *'
 
