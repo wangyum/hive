@@ -53,6 +53,14 @@ jobs:
         GPG_KEY: "not_used"
         GPG_PASSPHRASE: "not_used"
         GIT_REF: ${{ matrix.branch }}
-      run: ./dev-support/publish-snapshot.sh
-
+      run: |
+        # Publish Hive to Maven staging repo
+        tmp_settings="tmp-settings.xml"
+        echo "<settings><servers><server>" > $tmp_settings
+        echo "<id>apache.snapshots.https</id><username>$ASF_USERNAME</username>" >> $tmp_settings
+        echo "<password>$ASF_PASSWORD</password>" >> $tmp_settings
+        echo "</server></servers></settings>" >> $tmp_settings
+        mvn --settings $tmp_settings -DskipTests clean deploy
+        rm $tmp_settings
+        exit 0
 
