@@ -53,6 +53,6 @@ jobs:
         GPG_KEY: "not_used"
         GPG_PASSPHRASE: "not_used"
         GIT_REF: ${{ matrix.branch }}
-      run: ./dev/create-release/release-build.sh publish-snapshot
+      run: ./dev-support/publish-snapshot.sh
 
 
