@@ -35,7 +35,7 @@ jobs:
       matrix:
         branch:
           - master
-          - branch-3.1
+          - publish-snapshot
           - branch-2.3
     steps:
     - name: Checkout Hive repository
@@ -53,9 +53,5 @@ jobs:
         GPG_KEY: "not_used"
         GPG_PASSPHRASE: "not_used"
         GIT_REF: ${{ matrix.branch }}
-      run: |
-        # Publish Hive to Maven snapshots repo
-        mvn  -DskipTests clean deploy
-        rm $tmp_settings
-        exit 0
+      run: ./dev-support/publish-snapshot.sh
 
