@@ -55,14 +55,7 @@ jobs:
         GIT_REF: ${{ matrix.branch }}
       run: |
         # Publish Hive to Maven snapshots repo
-        echo ${secrets.NEXUS_USER}
-        echo ${${{ secrets.NEXUS_PW }}}
-        tmp_settings="tmp-settings.xml"
-        echo "<settings><servers><server>" > $tmp_settings
-        echo "<id>apache.snapshots.https</id><username>$ASF_USERNAME</username>" >> $tmp_settings
-        echo "<password>$ASF_PASSWORD</password>" >> $tmp_settings
-        echo "</server></servers></settings>" >> $tmp_settings
-        mvn --settings $tmp_settings -DskipTests clean deploy
+        mvn  -DskipTests clean deploy
         rm $tmp_settings
         exit 0
 
