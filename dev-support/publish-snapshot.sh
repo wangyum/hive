@@ -17,7 +17,23 @@
 # limitations under the License.
 #
 
-cd hive
+echo "#################"
+echo $1
+echo $2
+echo "#################"
+
+# Gather some user information.
+if [ -z "$ASF_USERNAME" ]; then
+  export ASF_USERNAME=$(read_config "ASF user" "$LOGNAME")
+fi
+
+if [ -z "$ASF_PASSWORD" ]; then
+  stty -echo && printf "ASF password: " && read ASF_PASSWORD && printf '\n' && stty echo
+fi
+
+export ASF_PASSWORD
+
+
 # Publish Hive to Maven staging repo
 tmp_settings="tmp-settings.xml"
 echo "<settings><servers><server>" > $tmp_settings
