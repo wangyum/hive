@@ -422,7 +422,9 @@ public class HiveMetaStoreClient implements IMetaStoreClient {
               String tokenSig = conf.getVar(ConfVars.METASTORE_TOKEN_SIGNATURE);
               // tokenSig could be null
               tokenStrForm = Utils.getTokenStrForm(tokenSig);
-              transport = new TSocket(new TConfiguration(), store.getHost(), store.getPort(), clientSocketTimeout, connectionTimeout);
+              TConfiguration tConfiguration = new TConfiguration();
+              tConfiguration.setMaxMessageSize(Integer.MAX_VALUE);
+              transport = new TSocket(tConfiguration, store.getHost(), store.getPort(), clientSocketTimeout);
 
               if(tokenStrForm != null) {
                 // authenticate using delegation tokens via the "DIGEST" mechanism
@@ -463,7 +465,9 @@ public class HiveMetaStoreClient implements IMetaStoreClient {
               }
             } else {
               try {
-                transport = new TSocket(new TConfiguration(), store.getHost(), store.getPort(), clientSocketTimeout, connectionTimeout);
+                TConfiguration tConfiguration = new TConfiguration();
+                tConfiguration.setMaxMessageSize(Integer.MAX_VALUE);
+                transport = new TSocket(tConfiguration, store.getHost(), store.getPort(), clientSocketTimeout);
               } catch (TTransportException e) {
                 tte = e;
                 throw new MetaException(e.toString());
